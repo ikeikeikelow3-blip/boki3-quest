@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>仕訳クエスト 簿記3級</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECF0EA; --sheet:#FBFCF9; --rule:#D3DCD2; --rule2:#B9C6B9;
+  --ink:#1B2236; --sub:#596377; --dr:#2556B5; --cr:#C43D28; --gold:#C9981C; --ok:#2B8350;
+  --btn:#1B2236; --btnink:#FBFCF9; --btnedge:#05070E;
+  --night:#141A35; --night2:#2B3670; --wink:#EEF1FA; --winbg:#10152C;
+  --hpHi:#4CC47E; --hpMid:#E8C04F; --hpLo:#EE6A52;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1120; --sheet:#161C31; --rule:#262F4C; --rule2:#36406A;
+    --ink:#E6EAF4; --sub:#98A2BA; --dr:#7DA4F4; --cr:#F2846D; --gold:#E8C04F; --ok:#5CC88C;
+    --btn:#E8C04F; --btnink:#141A35; --btnedge:#8A6A12;
+    --night:#0B0F22; --night2:#1F2856; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1120; --sheet:#161C31; --rule:#262F4C; --rule2:#36406A;
+  --ink:#E6EAF4; --sub:#98A2BA; --dr:#7DA4F4; --cr:#F2846D; --gold:#E8C04F; --ok:#5CC88C;
+  --btn:#E8C04F; --btnink:#141A35; --btnedge:#8A6A12;
+  --night:#0B0F22; --night2:#1F2856; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;font-size:16px;line-height:1.7;-webkit-tap-highlight-color:transparent}
+main{max-width:600px;margin:0 auto;padding:12px 14px 56px}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.px{font-family:"DotGothic16","MS Gothic",monospace;letter-spacing:.03em}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:8px;font-weight:800;font-size:16px;background:var(--btn);color:var(--btnink);box-shadow:0 4px 0 var(--btnedge);transition:transform .06s,box-shadow .06s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--btnedge)}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--rule2)}
+.btn.ghost:active{transform:translateY(1px)}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.topnav{display:flex;justify-content:space-between;align-items:center;min-height:40px;margin-bottom:6px}
+.back{color:var(--sub);font-size:14px;padding:8px 2px}
+.back::before{content:"‹ ";font-size:18px}
+
+/* night stage */
+.stage{border-radius:14px;overflow:hidden;background:var(--night);color:var(--wink);position:relative;margin-bottom:14px}
+.sky{position:relative;padding:14px 14px 0;background:
+  radial-gradient(1.6px 1.6px at 8% 22%,#fff 50%,transparent 52%),
+  radial-gradient(1.2px 1.2px at 23% 64%,#ffffffb0 50%,transparent 52%),
+  radial-gradient(1.8px 1.8px at 41% 14%,#fff 50%,transparent 52%),
+  radial-gradient(1.2px 1.2px at 62% 40%,#ffffffa0 50%,transparent 52%),
+  radial-gradient(1.6px 1.6px at 78% 18%,#fff 50%,transparent 52%),
+  radial-gradient(1.2px 1.2px at 91% 56%,#ffffffb0 50%,transparent 52%),
+  radial-gradient(1.4px 1.4px at 55% 72%,#ffffff80 50%,transparent 52%),
+  linear-gradient(180deg,var(--night) 0%,var(--night2) 100%)}
+.ground{height:22px;background:repeating-linear-gradient(90deg,#3E6440 0 12px,#355837 12px 24px);border-top:4px solid #68A05A;box-shadow:inset 0 -6px 0 #2A4430}
+.hud{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:#C3CAE6}
+.hud .power{color:#F3CF63;letter-spacing:1px}
+.win{background:var(--winbg);border:3px solid var(--wink);border-radius:6px;box-shadow:0 0 0 3px var(--winbg);margin:10px 12px 0;padding:8px 12px}
+.win:last-child{margin-bottom:14px}
+
+/* title */
+.title-sky{padding:22px 18px 0;text-align:center}
+.logo{margin:6px 0 0;font-family:"DotGothic16",monospace;font-weight:400;font-size:clamp(46px,14vw,72px);line-height:1.02;color:#FFF3CF;text-shadow:3px 3px 0 #C43D28,6px 6px 0 #05070E;letter-spacing:.04em}
+.tagline{margin:12px 0 0;font-size:14px;color:#C3CAE6}
+.lineup{display:flex;justify-content:center;align-items:flex-end;gap:2px;margin-top:14px;height:74px}
+.lineup .bob{width:56px;height:56px}
+.lineup .bob:nth-child(3){width:74px;height:74px}
+.lineup svg{width:100%;height:100%;display:block}
+.cmd{padding:6px 6px}
+.cmd-i{display:grid;grid-template-columns:22px 1fr auto;align-items:center;width:100%;text-align:left;padding:10px 8px;border-radius:4px;color:var(--wink)}
+.cmd-i::before{content:"▶";color:#F3CF63;font-size:13px;opacity:0;transition:opacity .1s}
+.cmd-i:hover::before,.cmd-i:focus-visible::before{opacity:1}
+.cmd:not(:hover):not(:focus-within) .cmd-i:first-child::before{opacity:1}
+.cmd-i:hover,.cmd-i:focus-visible{background:#1D2448;outline:none}
+.cmd-i b{font-family:"DotGothic16",monospace;font-weight:400;font-size:22px;display:block;line-height:1.3}
+.cmd-i span{font-size:13px;color:#AEB6D6;display:block}
+.cmd-i em{font-style:normal;font-size:12px;color:#F3CF63;text-align:right;padding-left:8px}
+.homefoot{font-size:13px;color:var(--sub);text-align:center;margin:4px 0 0}
+
+/* battle */
+.foe{display:grid;place-items:center;height:132px;position:relative}
+.foe .bob{width:120px;height:120px}
+.foe svg{width:100%;height:100%;display:block}
+.bob{animation:bob 1.6s steps(4) infinite}
+.lineup .bob:nth-child(2n){animation-delay:-.8s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.hit{animation:hit .42s}
+@keyframes hit{0%,100%{transform:translateX(0);filter:none}15%{filter:brightness(3)}20%{transform:translateX(-12px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(3px)}}
+.down{animation:down .7s forwards}
+@keyframes down{to{opacity:0;transform:translateY(16px) scaleY(.4)}}
+.hurt{animation:hurt .5s}
+@keyframes hurt{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}}
+.flash::after{content:"";position:absolute;inset:0;background:#EE2B12;opacity:0;animation:flash .45s;pointer-events:none}
+@keyframes flash{30%{opacity:.35}}
+.fx{position:absolute;inset:0;pointer-events:none}
+.pop{position:absolute;left:50%;top:44%;transform:translate(-50%,0);font-family:"DotGothic16",monospace;font-size:40px;color:#FFF3CF;text-shadow:3px 3px 0 #C43D28,-2px -2px 0 #05070E,2px -2px 0 #05070E,-2px 2px 0 #05070E;animation:pop 1s forwards;white-space:nowrap}
+.pop.crit{font-size:50px;color:#FFE27A}
+.pop.me{top:70%;color:#FFD2C8;text-shadow:3px 3px 0 #05070E}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,10px) scale(.6)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-30px)}}
+.banner{position:absolute;left:0;right:0;top:38%;text-align:center;font-family:"DotGothic16",monospace;font-size:clamp(32px,10vw,46px);color:#FFF3CF;text-shadow:3px 3px 0 #C43D28,5px 5px 0 #05070E;animation:banner .5s steps(5)}
+@keyframes banner{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.who{display:flex;justify-content:space-between;font-family:"DotGothic16",monospace;font-size:15px;line-height:1.4}
+.who span:last-child{font-variant-numeric:tabular-nums;color:#C3CAE6}
+.hp{height:12px;border:2px solid var(--wink);border-radius:3px;background:#2A2F4D;margin:2px 0 7px;position:relative;overflow:hidden}
+.hp::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 9px,#10152C 9px 11px)}
+.hp i{display:block;height:100%;width:100%;background:var(--hpHi);transition:width .5s steps(8)}
+.hp i[data-l="mid"]{background:var(--hpMid)} .hp i[data-l="lo"]{background:var(--hpLo)}
+.hp.foe-hp i{background:#EE6A52}
+.clock{display:grid;grid-template-columns:auto 1fr 2.2em;gap:8px;align-items:center;font-size:12px;color:#C3CAE6}
+.clock span:last-child{font-family:"DotGothic16",monospace;font-size:15px;text-align:right;color:var(--wink);font-variant-numeric:tabular-nums}
+.tbar{height:6px;background:#2A2F4D;border-radius:3px;overflow:hidden}
+.tbar i{display:block;height:100%;width:100%;background:#F3CF63}
+.tbar i.low{background:#EE6A52}
+.msg{font-family:"DotGothic16",monospace;font-size:16px;line-height:1.55;min-height:52px;position:relative;padding-right:26px}
+.msg::after{content:"▼";position:absolute;right:10px;bottom:6px;font-size:11px;color:#F3CF63;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* journal slip */
+.slip{position:relative;background:var(--sheet);border-radius:4px;box-shadow:0 0 0 1px var(--rule2),0 6px 0 -2px var(--rule);padding:16px 14px 18px}
+.slip-h{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--sub);padding-bottom:8px;border-bottom:2px solid var(--ink)}
+.lv{font-weight:700;color:var(--ink);white-space:nowrap}
+.lv .st{color:var(--gold);letter-spacing:1px}
+.qtext{font-size:17px;font-weight:500;line-height:1.75;margin:12px 0 16px;min-height:3.5em}
+.jt{display:grid;grid-template-columns:1fr 1fr;border:2px solid var(--ink);border-radius:2px}
+.jh{text-align:center;font-weight:800;font-size:15px;padding:6px 0;border-bottom:2px solid var(--ink)}
+.jh.d{color:var(--dr)} .jh.c{color:var(--cr);border-left:2px solid var(--ink)}
+.cell{padding:8px 7px;border-bottom:1px solid var(--rule);min-width:0;display:grid;gap:6px;align-content:start}
+.cell.c{border-left:2px solid var(--ink)}
+.cell.blank{background:repeating-linear-gradient(135deg,transparent 0 8px,var(--rule) 8px 9px)}
+.acct{width:100%;min-height:42px;border-radius:6px;border:1.5px dashed var(--rule2);color:var(--sub);font-size:15px;padding:4px 6px;text-align:center;line-height:1.3}
+.acct.set{border-style:solid;color:var(--ink);font-weight:700;background:var(--paper)}
+.cell.d .acct.set{border-color:var(--dr)} .cell.c .acct.set{border-color:var(--cr)}
+.amt{display:flex;align-items:center;border-bottom:1.5px solid var(--rule2);padding:0 2px}
+.amt span{color:var(--sub);font-size:13px}
+.amt input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--ink);font:inherit;font-size:17px;font-weight:700;text-align:right;padding:6px 0;font-variant-numeric:tabular-nums}
+.amt input:focus{outline:none}
+.amt:focus-within{border-bottom-color:var(--gold);box-shadow:0 2px 0 var(--gold)}
+.jf{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);padding:6px 8px;border-top:2px solid var(--ink);font-variant-numeric:tabular-nums}
+.jf b{color:var(--ink);font-size:15px}
+.jf.c{border-left:2px solid var(--ink)}
+.cell.good .acct,.cell.good .amt{border-color:var(--ok)}
+.cell.bad{background:color-mix(in srgb,var(--cr) 9%,transparent)}
+.bal{font-size:13px;color:var(--sub);text-align:center;margin:8px 0 0;min-height:1.7em}
+.bal.ok{color:var(--ok);font-weight:700}
+.slip-a{margin-top:14px}
+.jt{position:relative}
+.stamp{position:absolute;bottom:-26px;right:10px;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;border:4px solid currentColor;color:var(--cr);font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;font-weight:800;font-size:22px;line-height:1.1;text-align:center;transform:rotate(-12deg);opacity:.88;animation:stamp .32s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
+.stamp::before{content:"";position:absolute;inset:4px;border:1.5px solid currentColor;border-radius:50%}
+.stamp.ng{color:var(--dr)}
+@keyframes stamp{from{transform:rotate(-12deg) scale(1.8);opacity:0}}
+.res{margin-top:16px;border-top:1px dashed var(--rule2);padding-top:12px}
+.res h3{font-size:14px;margin:0 0 6px;color:var(--sub);font-weight:700}
+.ans{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums;margin-bottom:12px}
+.ans th{font-size:13px;padding:4px 6px;border-bottom:2px solid var(--ink)}
+.ans th.d{color:var(--dr);text-align:left} .ans th.c{color:var(--cr);text-align:left;border-left:2px solid var(--ink)}
+.ans td{padding:5px 6px;border-bottom:1px solid var(--rule)}
+.ans td.n{text-align:right;font-weight:700}
+.ans td.c1{border-left:2px solid var(--ink)}
+.exp{margin:0;font-size:15px;line-height:1.75}
+.next{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.next .btn{flex:1}
+
+/* compact sticky battle header (mobile-first) */
+.bhead{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;margin:-12px -14px 12px;padding:8px 12px 10px;color:var(--wink);border-radius:0 0 14px 14px;box-shadow:0 4px 0 #05070E40}
+body.battle::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--night)}
+.bh-top{display:flex;align-items:center;gap:10px;font-size:12px;color:#C3CAE6;min-height:30px}
+.bh-top .back{color:#C3CAE6;font-size:13px;padding:4px 6px 4px 0}
+.bh-top .grow{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bh-top .power{color:#F3CF63;letter-spacing:1px}
+.bh-main{display:grid;grid-template-columns:84px 1fr;gap:10px;align-items:center;margin-top:2px}
+.bh-foe{height:84px;display:grid;place-items:end center;border-bottom:3px solid #68A05A;background:linear-gradient(transparent calc(100% - 8px),#3E6440 0)}
+.bh-foe .bob{width:70px;height:70px;margin-bottom:2px}
+.bh-foe svg{width:100%;height:100%;display:block}
+.bh-stats .who{font-size:13px}
+.bh-stats .hp{height:10px;margin:1px 0 5px}
+.bh-stats .clock{margin-top:2px}
+.bhead .msg{margin:8px 0 0;padding:6px 26px 6px 10px;font-size:14px;min-height:calc(2 * 1.55em + 12px);background:var(--winbg);border:3px solid var(--wink);border-radius:6px}
+.bhead .pop{left:54px;top:40px;font-size:32px}
+.bhead .pop.crit{font-size:40px}
+.bhead .pop.me{left:68%;top:44px;font-size:28px}
+.bhead .banner{top:34%;font-size:clamp(28px,9vw,40px)}
+.bhead .duel{margin-top:4px}
+#duel .pop{left:80%;top:30px}
+#duel .pop.me{left:22%;top:30px}
+.slip-a,.next{position:sticky;bottom:0;z-index:4;background:var(--sheet);margin-left:-14px;margin-right:-14px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--rule)}
+.slip-a{margin-bottom:-18px;margin-top:12px}
+.next{margin-bottom:-18px}
+@media (max-height:720px){
+  .logo{font-size:clamp(38px,11vw,52px)}
+  .title-sky{padding-top:14px}
+  .lineup{height:54px;margin-top:8px}.lineup .bob{width:42px;height:42px}.lineup .bob:nth-child(3){width:54px;height:54px}
+  .cmd-i{padding:6px 8px}.cmd-i b{font-size:19px}
+  .qtext{font-size:16px;margin:8px 0 12px;min-height:0}
+  .slip{padding-top:12px}
+  .acct{min-height:38px}
+}
+
+/* options */
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:center;text-align:left;padding:12px;border-radius:8px;box-shadow:inset 0 0 0 1.5px var(--rule2)}
+.opt b{display:block;font-size:16px}
+.opt small{display:block;font-size:13px;color:var(--sub);line-height:1.5}
+.dotr{width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--rule2)}
+.opt[aria-checked="true"]{box-shadow:inset 0 0 0 2.5px var(--gold);background:var(--paper)}
+.opt[aria-checked="true"] .dotr{box-shadow:inset 0 0 0 6px var(--gold)}
+.tprev{display:grid;grid-template-columns:repeat(5,1fr);margin-top:14px;border-radius:4px;box-shadow:0 0 0 1px var(--rule2)}
+.tprev div{text-align:center;padding:8px 2px}
+.tprev div+div{border-left:1px solid var(--rule)}
+.tprev small{display:block;font-size:11px;color:var(--sub)}
+.tprev b{font-family:"DotGothic16",monospace;font-weight:400;font-size:17px}
+.clock .nolimit{grid-column:2/4;text-align:right;font-family:"DotGothic16",monospace;font-size:14px;color:var(--wink)}
+
+/* picker sheet */
+.sheet-ov{position:fixed;inset:0;background:#05070E99;display:flex;align-items:flex-end;justify-content:center;z-index:20;opacity:0;transition:opacity .15s}
+.sheet-ov.open{opacity:1}
+.sheet{width:100%;max-width:600px;background:var(--sheet);border-radius:16px 16px 0 0;padding:14px 14px calc(18px + env(safe-area-inset-bottom,0px));max-height:75vh;overflow:auto;transform:translateY(20px);transition:transform .18s}
+.sheet-ov.open .sheet{transform:none}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sheet-h b{font-size:16px}
+.sheet-h b.d{color:var(--dr)} .sheet-h b.c{color:var(--cr)}
+.x{width:40px;height:40px;border-radius:50%;font-size:22px;color:var(--sub)}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pick{min-height:50px;border-radius:8px;box-shadow:inset 0 0 0 1.5px var(--rule2);font-weight:700;font-size:15px;padding:4px 8px}
+.pick.on{box-shadow:inset 0 0 0 2.5px var(--gold);background:var(--paper)}
+.pick:active{background:var(--paper)}
+
+/* page heads */
+.pagehead h1{font-family:"DotGothic16",monospace;font-weight:400;font-size:34px;line-height:1.2;margin:4px 0 4px}
+.pagehead p{margin:0 0 16px;color:var(--sub);font-size:14px}
+.report{display:grid;grid-template-columns:repeat(4,1fr);background:var(--sheet);box-shadow:0 0 0 1px var(--rule2);border-radius:4px;margin-bottom:16px}
+.report div{padding:10px 8px;text-align:center}
+.report div+div{border-left:1px solid var(--rule)}
+.report b{display:block;font-family:"DotGothic16",monospace;font-weight:400;font-size:24px;line-height:1.2;font-variant-numeric:tabular-nums}
+.report span{font-size:11px;color:var(--sub)}
+.filters{display:grid;gap:10px;margin-bottom:16px}
+.fl>span{display:block;font-size:13px;color:var(--sub);margin-bottom:4px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.tab{flex:none;min-height:38px;padding:0 13px;border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--rule2);font-size:14px;white-space:nowrap}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--paper);box-shadow:none;font-weight:700}
+.empty{background:var(--sheet);box-shadow:0 0 0 1px var(--rule2);border-radius:4px;padding:28px 18px;text-align:center;color:var(--sub)}
+
+/* versus */
+.panel{background:var(--sheet);box-shadow:0 0 0 1px var(--rule2);border-radius:4px;padding:16px 14px;margin-bottom:12px}
+.panel h2{font-size:16px;margin:0 0 10px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rules div{background:var(--sheet);box-shadow:0 0 0 1px var(--rule2);border-radius:4px;padding:10px 6px;text-align:center;font-size:12px;color:var(--sub);line-height:1.4}
+.rules b{display:block;font-family:"DotGothic16",monospace;font-weight:400;font-size:22px;color:var(--ink)}
+.rules .g b{color:var(--ok)} .rules .r b{color:var(--cr)}
+.field{display:grid;gap:4px}
+.field label{font-size:13px;color:var(--sub)}
+.field input{min-width:0;width:100%;font:inherit;font-size:17px;padding:10px 12px;border:0;border-radius:6px;box-shadow:inset 0 0 0 1.5px var(--rule2);background:var(--paper);color:var(--ink)}
+.codein{font-family:"DotGothic16",monospace!important;font-size:30px!important;letter-spacing:.5em;text-align:center;padding-left:.5em!important}
+.or{display:flex;align-items:center;gap:10px;color:var(--sub);font-size:13px;margin:16px 0}
+.or::before,.or::after{content:"";flex:1;border-top:1px solid var(--rule2)}
+.note{font-size:13px;color:var(--sub);margin:10px 0 0}
+.lobby{padding:18px 14px 0;text-align:center}
+.codebox{display:flex;justify-content:center;gap:8px;margin:8px 0 6px}
+.codebox span{width:52px;height:64px;display:grid;place-items:center;font-family:"DotGothic16",monospace;font-size:40px;background:var(--winbg);border:3px solid var(--wink);border-radius:6px;box-shadow:0 0 0 3px var(--winbg)}
+.lobby p{font-size:13px;color:#C3CAE6;margin:6px 0 0}
+.plates{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.plate{font-family:"DotGothic16",monospace;font-size:16px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plate small{display:block;font-size:12px;color:#AEB6D6}
+.plate.wait{color:#7F88AE}
+.vs{font-family:"DotGothic16",monospace;font-size:26px;color:#F3CF63;text-shadow:2px 2px 0 #C43D28}
+.duel{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.duel .who{font-size:14px}
+.duel .hp{margin-bottom:4px}
+.duel .meta{font-size:12px;color:#AEB6D6;font-variant-numeric:tabular-nums}
+.count{font-family:"DotGothic16",monospace;font-size:96px;text-align:center;color:#FFF3CF;text-shadow:4px 4px 0 #C43D28,8px 8px 0 #05070E;line-height:1.3;padding:30px 0 10px}
+.vend{text-align:center;padding:20px 14px}
+.vend .big{font-family:"DotGothic16",monospace;font-size:36px;line-height:1.3}
+
+@media (prefers-reduced-motion: reduce){
+  .bob,.hit,.down,.hurt,.flash::after,.pop,.banner,.stamp,.msg::after{animation:none!important}
+  .hp i,.btn,.sheet,.sheet-ov{transition:none}
+}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+"use strict";
+/* ---------- data ---------- */
+const CATS={shohin:"商品売買",genkin:"現金・預金",saiken:"債権・債務",sonota:"固定資産・純資産・税",kessan:"決算整理"};
+const ACC=["現金","小口現金","当座預金","普通預金","受取手形","売掛金","クレジット売掛金","電子記録債権","繰越商品","前払金","未収入金","仮払金","貸付金","前払費用","未収収益","仮払消費税","仮払法人税等","差入保証金","建物","備品","車両運搬具","土地","支払手形","買掛金","電子記録債務","未払金","前受金","仮受金","所得税預り金","社会保険料預り金","借入金","当座借越","未払費用","前受収益","未払消費税","未払法人税等","未払配当金","仮受消費税","貸倒引当金","減価償却累計額","資本金","利益準備金","繰越利益剰余金","売上","受取手数料","受取家賃","受取利息","雑益","償却債権取立益","貸倒引当金戻入","固定資産売却益","仕入","給料","法定福利費","発送費","旅費交通費","通信費","消耗品費","支払家賃","租税公課","修繕費","支払利息","支払手数料","貸倒損失","貸倒引当金繰入","減価償却費","雑損","固定資産売却損","現金過不足","法人税等"];
+// [cat, 問題文, 借方, 貸方, 解説, 難易度1-3]
+const RAW=[
+["shohin","商品50,000円を仕入れ、代金は掛けとした。","仕入:50000","買掛金:50000","掛けで仕入れたら負債の「買掛金」が増える。",1],
+["shohin","商品80,000円を売り上げ、代金は掛けとした。","売掛金:80000","売上:80000","掛けで売ったら資産の「売掛金」が増える。",1],
+["shohin","商品30,000円を仕入れ、代金のうち10,000円は現金で支払い、残額は掛けとした。","仕入:30000","現金:10000,買掛金:20000","支払方法が分かれても、仕入は合計額で計上する。",2],
+["shohin","商品60,000円を掛けで売り上げ、当社負担の発送費2,000円を現金で支払った。","売掛金:60000,発送費:2000","売上:60000,現金:2000","当社負担の発送費は費用「発送費」で処理する。",2],
+["shohin","商品の注文にあたり、手付金10,000円を現金で支払った。","前払金:10000","現金:10000","商品を受け取る前に払った代金は資産「前払金」。",1],
+["shohin","注文していた商品50,000円を受け取り、手付金10,000円を差し引いた残額は掛けとした。","仕入:50000","前払金:10000,買掛金:40000","前払金を取り崩し、残りを買掛金とする。",2],
+["shohin","得意先から商品の注文を受け、内金15,000円を現金で受け取った。","現金:15000","前受金:15000","商品を渡す前に受け取った代金は負債「前受金」。",1],
+["shohin","商品50,000円をクレジット払いで販売した。信販会社への手数料は販売代金の2%で、販売時に計上する。","クレジット売掛金:49000,支払手数料:1000","売上:50000","手数料1,000円を差し引いた額がクレジット売掛金。",3],
+["shohin","商品11,000円（うち消費税1,000円）を掛けで仕入れた。税抜方式で処理する。","仕入:10000,仮払消費税:1000","買掛金:11000","仕入時に払った消費税は「仮払消費税」。",2],
+["shohin","商品22,000円（うち消費税2,000円）を掛けで売り上げた。税抜方式で処理する。","売掛金:22000","売上:20000,仮受消費税:2000","売上時に受け取った消費税は「仮受消費税」。",2],
+["shohin","商品60,000円を掛けで仕入れ、当社負担の引取運賃3,000円を現金で支払った。","仕入:63000","買掛金:60000,現金:3000","仕入側の引取運賃は仕入原価に含める。",2],
+["shohin","掛けで仕入れた商品のうち5,000円分を品違いのため返品した。","買掛金:5000","仕入:5000","返品は仕入時の逆仕訳。",1],
+["genkin","売掛金40,000円が普通預金口座に振り込まれた。","普通預金:40000","売掛金:40000","振込で回収したので普通預金が増え、売掛金が減る。",1],
+["genkin","買掛金25,000円を小切手を振り出して支払った。","買掛金:25000","当座預金:25000","小切手を振り出したら当座預金が減る。",1],
+["genkin","普通預金口座に50,000円の入金があったが、内容は不明である。","普通預金:50000","仮受金:50000","内容不明の入金はいったん負債「仮受金」。",1],
+["genkin","現金の帳簿残高は50,000円、実際有高は48,000円だった。","現金過不足:2000","現金:2000","実際が少ないので帳簿の現金を減らし、差額は現金過不足。",2],
+["genkin","小口現金係から、通信費3,000円・消耗品費2,000円の支払報告を受け、ただちに同額を小切手で補給した。","通信費:3000,消耗品費:2000","当座預金:5000","報告と同時補給なら小口現金を通さずにまとめて仕訳できる。",2],
+["genkin","普通預金口座から当座預金口座へ100,000円を振り替えた。","当座預金:100000","普通預金:100000","預金間の移動。増えた口座が借方。",1],
+["genkin","仲介手数料5,000円を現金で受け取った。","現金:5000","受取手数料:5000","手数料の受取は収益「受取手数料」。",1],
+["genkin","郵便切手1,000円分を購入し、現金で支払った。","通信費:1000","現金:1000","切手は「通信費」。",1],
+["saiken","備品300,000円を購入し、代金は月末に支払うことにした。","備品:300000","未払金:300000","商品以外の購入代金の後払いは「未払金」。",1],
+["saiken","従業員の出張にあたり、旅費の概算額30,000円を現金で渡した。","仮払金:30000","現金:30000","金額が確定していない支出は資産「仮払金」。",1],
+["saiken","出張から戻った従業員から、旅費は28,000円だったと報告を受け、残金2,000円を現金で受け取った。","旅費交通費:28000,現金:2000","仮払金:30000","仮払金を全額取り崩し、実費を旅費交通費に。",2],
+["saiken","給料200,000円の支給にあたり、所得税の源泉徴収額15,000円を差し引き、残額を普通預金口座から支払った。","給料:200000","所得税預り金:15000,普通預金:185000","天引きした所得税は負債「所得税預り金」。",2],
+["saiken","従業員から預かっていた所得税15,000円を税務署に現金で納付した。","所得税預り金:15000","現金:15000","預り金を納付したら負債が減る。",1],
+["saiken","銀行から500,000円を借り入れ、普通預金口座に入金された。","普通預金:500000","借入金:500000","借りたお金は負債「借入金」。",1],
+["saiken","借入金500,000円と利息10,000円を普通預金口座から返済した。","借入金:500000,支払利息:10000","普通預金:510000","利息は費用「支払利息」。",2],
+["saiken","商品100,000円を売り上げ、代金として約束手形を受け取った。","受取手形:100000","売上:100000","受け取った約束手形は資産「受取手形」。",1],
+["saiken","買掛金70,000円の支払いのため、約束手形を振り出した。","買掛金:70000","支払手形:70000","振り出した約束手形は負債「支払手形」。",1],
+["saiken","売掛金30,000円について、取引先の承諾を得て電子記録債権の発生記録を行った。","電子記録債権:30000","売掛金:30000","売掛金が電子記録債権に置き換わる。",2],
+["sonota","土地1,000,000円を購入し、仲介手数料50,000円とともに小切手を振り出して支払った。","土地:1050000","当座預金:1050000","購入時の付随費用は取得原価に含める。",2],
+["sonota","収入印紙2,000円分を購入し、現金で支払った。","租税公課:2000","現金:2000","収入印紙は「租税公課」。",1],
+["sonota","株式を発行し、1,000,000円の払込みを受けて普通預金とした。","普通預金:1000000","資本金:1000000","株式発行による払込みは「資本金」。",1],
+["sonota","法人税等の中間申告を行い、100,000円を普通預金口座から納付した。","仮払法人税等:100000","普通預金:100000","中間納付額は資産「仮払法人税等」。",2],
+["sonota","備品（取得原価400,000円、減価償却累計額240,000円）を150,000円で売却し、代金は月末に受け取ることにした。","減価償却累計額:240000,未収入金:150000,固定資産売却損:10000","備品:400000","帳簿価額160,000円を150,000円で売ったので10,000円の売却損。",3],
+["sonota","株主総会で繰越利益剰余金から配当金200,000円を支払うこと、利益準備金20,000円を積み立てることが決まった。","繰越利益剰余金:220000","未払配当金:200000,利益準備金:20000","配当金はまだ払っていないので「未払配当金」。",3],
+["sonota","建物の修繕を行い、修繕費50,000円を現金で支払った。","修繕費:50000","現金:50000","原状回復の支出は費用「修繕費」。",1],
+["sonota","店舗を借りるにあたり、敷金200,000円を普通預金口座から支払った。","差入保証金:200000","普通預金:200000","敷金は返還される資産「差入保証金」。",2],
+["kessan","決算にあたり、現金過不足（借方残高）2,000円の原因が不明のため、適切に処理する。","雑損:2000","現金過不足:2000","借方残高の原因不明分は費用「雑損」。",1],
+["kessan","前期に発生した売掛金20,000円が貸し倒れた。貸倒引当金の残高は30,000円である。","貸倒引当金:20000","売掛金:20000","前期発生分は貸倒引当金を取り崩す。",2],
+["kessan","当期に発生した売掛金10,000円が貸し倒れた。","貸倒損失:10000","売掛金:10000","当期発生分は「貸倒損失」。",1],
+["kessan","決算にあたり、売掛金残高400,000円に対して2%の貸倒引当金を差額補充法で設定する。貸倒引当金の残高は3,000円である。","貸倒引当金繰入:5000","貸倒引当金:5000","400,000×2%＝8,000円、残高3,000円との差額5,000円を繰り入れる。",3],
+["kessan","決算にあたり、備品の減価償却費60,000円を間接法で計上する。","減価償却費:60000","減価償却累計額:60000","間接法では「減価償却累計額」を使う。",1],
+["kessan","支払家賃のうち、次期分40,000円を繰り延べる。","前払費用:40000","支払家賃:40000","次期分の費用は資産「前払費用」に振り替える。",2],
+["kessan","決算にあたり、借入金の利息3,000円が未払いである。","支払利息:3000","未払費用:3000","当期分の未払費用を計上する。",1],
+["kessan","受取家賃のうち、次期分20,000円を繰り延べる。","受取家賃:20000","前受収益:20000","次期分の収益は負債「前受収益」に振り替える。",2],
+["kessan","決算にあたり、法人税等250,000円を計上する。なお、中間納付額100,000円がある。","法人税等:250000","仮払法人税等:100000,未払法人税等:150000","中間納付分を差し引いた残りが「未払法人税等」。",3],
+["kessan","決算にあたり、仮受消費税2,000円と仮払消費税1,000円を相殺し、納付額を確定する。","仮受消費税:2000","仮払消費税:1000,未払消費税:1000","差額が「未払消費税」。",2],
+["kessan","前期に貸倒れとして処理した売掛金8,000円を現金で回収した。","現金:8000","償却債権取立益:8000","過去に貸倒処理した分の回収は「償却債権取立益」。",2],
+["kessan","決算にあたり、貸付金の利息4,000円を未収として計上する。","未収収益:4000","受取利息:4000","当期分の未収利息は資産「未収収益」。",1],
+["shohin","商品120,000円を売り上げ、代金のうち50,000円は約束手形で受け取り、残額は掛けとした。","受取手形:50000,売掛金:70000","売上:120000","受け取り方が分かれても、売上は合計額で計上する。",2],
+["shohin","商品80,000円を売り上げ、受け取っていた内金15,000円を差し引いた残額は掛けとした。","前受金:15000,売掛金:65000","売上:80000","前受金を取り崩し、残額を売掛金にする。",2],
+["shohin","商品200,000円（税抜）を仕入れ、消費税20,000円とあわせた代金のうち80,000円は約束手形を振り出し、残額は掛けとした。税抜方式で処理する。","仕入:200000,仮払消費税:20000","支払手形:80000,買掛金:140000","税込220,000円を手形80,000円と掛け140,000円に分ける。",3],
+["genkin","買掛金50,000円を普通預金口座から振り込んだ。振込手数料500円も同口座から引き落とされた。","買掛金:50000,支払手数料:500","普通預金:50500","振込手数料は費用「支払手数料」。",2],
+["genkin","売掛金30,000円を、得意先が振り出した小切手で回収した。","現金:30000","売掛金:30000","他人振出の小切手は「現金」で処理する。",2],
+["genkin","売掛金20,000円を、以前に当社が振り出した小切手で回収した。","当座預金:20000","売掛金:20000","自己振出の小切手が戻ってきたら当座預金を増やす。",3],
+["genkin","現金過不足（借方残高）2,000円の原因を調べたところ、通信費の記帳漏れと判明した。","通信費:2000","現金過不足:2000","原因が判明したら正しい科目へ振り替える。",2],
+["saiken","給料300,000円の支給にあたり、所得税20,000円と社会保険料30,000円を差し引き、残額を普通預金口座から支払った。","給料:300000","所得税預り金:20000,社会保険料預り金:30000,普通預金:250000","天引き額はそれぞれの預り金で処理する。",3],
+["saiken","社会保険料の従業員負担分30,000円と会社負担分30,000円をあわせて現金で納付した。","社会保険料預り金:30000,法定福利費:30000","現金:60000","会社負担分は費用「法定福利費」。",3],
+["sonota","営業用の車両1,500,000円を購入し、登録手数料30,000円とあわせて、500,000円は普通預金口座から支払い、残額は翌月払いとした。","車両運搬具:1530000","普通預金:500000,未払金:1030000","付随費用を含めた1,530,000円が取得原価。",3],
+["kessan","決算にあたり、現金過不足（貸方残高）5,000円のうち3,000円は受取手数料の記帳漏れと判明し、残りは原因不明であった。","現金過不足:5000","受取手数料:3000,雑益:2000","貸方残高の原因不明分は収益「雑益」。",3],
+["kessan","決算にあたり、売上原価を仕入勘定で算定する。期首商品棚卸高は30,000円、期末商品棚卸高は40,000円である。","仕入:30000,繰越商品:40000","繰越商品:30000,仕入:40000","期首商品は仕入へ、期末商品は繰越商品へ振り替える（しーくり・くりしー）。",3],
+["kessan","決算にあたり、当座預金勘定が20,000円の貸方残高となっているため、当座借越勘定に振り替える。","当座預金:20000","当座借越:20000","当座預金の貸方残高は負債「当座借越」へ振り替える。",2],
+["kessan","決算にあたり、備品（取得原価600,000円、残存価額ゼロ、耐用年数5年）の減価償却を定額法・間接法で行う。","減価償却費:120000","減価償却累計額:120000","600,000円÷5年＝120,000円。",2],
+["kessan","決算（3月31日）にあたり、当期10月1日に取得した備品480,000円（残存価額ゼロ、耐用年数4年）の減価償却を定額法・間接法・月割で行う。","減価償却費:60000","減価償却累計額:60000","480,000円÷4年×6か月/12か月＝60,000円。",3],
+["kessan","決算にあたり、売掛金残高300,000円に対して2%の貸倒引当金を差額補充法で設定する。貸倒引当金の残高は8,000円である。","貸倒引当金:2000","貸倒引当金戻入:2000","設定額6,000円より残高が多いので、差額2,000円を戻し入れる。",3],
+["kessan","前期に発生した売掛金50,000円が貸し倒れた。貸倒引当金の残高は30,000円である。","貸倒引当金:30000,貸倒損失:20000","売掛金:50000","引当金で足りない分は「貸倒損失」。",3]
+];
+const parseSide=s=>s.split(",").map(x=>{const[a,n]=x.split(":");return{a,n:+n}});
+const Q=RAW.map((r,i)=>({id:i,cat:r[0],text:r[1],dr:parseSide(r[2]),cr:parseSide(r[3]),exp:r[4],lv:r[5]}));
+const STARS=n=>"★".repeat(n)+"☆".repeat(3-n);
+const LVNAME={1:"基本",2:"標準",3:"応用"};;
+
+const ENEMIES=[
+ {name:"掛売りスライム",cat:"shohin",hp:80,atk:12,time:50,w:{1:1},col:"#5CC88C",kind:"slime"},
+ {name:"小切手バット",cat:"genkin",hp:110,atk:16,time:45,w:{1:2,2:1},col:"#8A7CF0",kind:"bat"},
+ {name:"手形ゴブリン",cat:"saiken",hp:140,atk:20,time:40,w:{1:1,2:2,3:1},col:"#D9A441",kind:"goblin"},
+ {name:"償却ゴーレム",cat:"sonota",hp:170,atk:25,time:35,w:{2:2,3:2},col:"#8E9AAB",kind:"golem"},
+ {name:"決算ドラゴン",cat:"kessan",hp:210,atk:30,time:30,w:{2:1,3:3},col:"#F07B62",kind:"dragon"}
+];
+
+/* ---------- utils ---------- */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const yen=n=>n.toLocaleString("ja-JP");
+function rngOf(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,rnd=Math.random){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const store={get(k,d){try{const v=localStorage.getItem("boki3:"+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem("boki3:"+k,JSON.stringify(v))}catch(e){}}};
+let timerId=null; function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}}
+
+/* ---------- monster art (original) ---------- */
+function monster(e){
+  const c=e.col;
+  const eyes=`<circle cx="52" cy="64" r="9" fill="#fff"/><circle cx="88" cy="64" r="9" fill="#fff"/><circle cx="54" cy="66" r="4.5" fill="#18263A"/><circle cx="86" cy="66" r="4.5" fill="#18263A"/>`;
+  let body="";
+  if(e.kind==="slime") body=`<path d="M20 112 Q20 40 70 30 Q120 40 120 112 Z" fill="${c}"/><ellipse cx="50" cy="48" rx="10" ry="6" fill="#fff" opacity=".35"/>${eyes}<path d="M58 88 Q70 96 82 88" stroke="#18263A" stroke-width="4" fill="none" stroke-linecap="round"/><text x="70" y="108" font-size="14" text-anchor="middle" fill="#18263A" font-family="DotGothic16">掛</text>`;
+  if(e.kind==="bat") body=`<path d="M70 50 L10 30 L22 60 L4 72 L40 80 Z" fill="${c}" opacity=".85"/><path d="M70 50 L130 30 L118 60 L136 72 L100 80 Z" fill="${c}" opacity=".85"/><rect x="40" y="40" width="60" height="60" rx="8" fill="#F2F5F8"/><rect x="40" y="40" width="60" height="14" rx="4" fill="${c}"/>${eyes}<path d="M60 88 L64 94 L68 88 L72 94 L76 88 L80 94" stroke="#18263A" stroke-width="3" fill="none"/>`;
+  if(e.kind==="goblin") body=`<path d="M30 60 L8 44 L34 52 Z M110 60 L132 44 L106 52 Z" fill="${c}"/><ellipse cx="70" cy="72" rx="42" ry="40" fill="${c}"/>${eyes}<path d="M54 92 L86 92" stroke="#18263A" stroke-width="4" stroke-linecap="round"/><rect x="88" y="96" width="38" height="24" rx="3" fill="#F2F5F8" stroke="#18263A" stroke-width="2"/><text x="107" y="113" font-size="11" text-anchor="middle" fill="#18263A" font-family="DotGothic16">手形</text>`;
+  if(e.kind==="golem") body=`<rect x="26" y="34" width="88" height="80" rx="6" fill="${c}"/><rect x="26" y="34" width="88" height="80" rx="6" fill="none" stroke="#18263A" stroke-width="3" stroke-dasharray="6 5"/><rect x="40" y="56" width="22" height="14" fill="#F07B62"/><rect x="78" y="56" width="22" height="14" fill="#F07B62"/><path d="M48 96 L92 96" stroke="#18263A" stroke-width="5"/><path d="M34 112 L34 128 M106 112 L106 128" stroke="${c}" stroke-width="12"/><text x="70" y="50" font-size="11" text-anchor="middle" fill="#18263A" font-family="DotGothic16">累計額</text>`;
+  if(e.kind==="dragon") body=`<path d="M22 80 L2 40 L40 62 Z M118 80 L138 40 L100 62 Z" fill="#B53A26"/><path d="M44 30 L52 8 L60 30 M80 30 L88 8 L96 30" fill="${c}"/><ellipse cx="70" cy="70" rx="48" ry="44" fill="${c}"/>${eyes}<path d="M48 94 L56 102 L64 94 L72 102 L80 94 L88 102 L94 94" stroke="#fff" stroke-width="3" fill="none"/><circle cx="58" cy="82" r="2.5" fill="#18263A"/><circle cx="82" cy="82" r="2.5" fill="#18263A"/>`;
+  return `<svg viewBox="0 0 140 140" aria-hidden="true">${body}</svg>`;
+}
+
+/* ---------- journal entry UI ---------- */
+function optionsFor(q,rnd){
+  const need=new Set([...q.dr,...q.cr].map(x=>x.a));
+  const pool=shuffle(ACC.filter(a=>!need.has(a)),rnd);
+  while(need.size<8&&pool.length) need.add(pool.pop());
+  return [...need].sort((a,b)=>ACC.indexOf(a)-ACC.indexOf(b));
+}
+let sheetEl=null;
+function closePicker(ret){if(sheetEl){sheetEl.remove();sheetEl=null}if(ret&&ret.focus)ret.focus({preventScroll:true})}
+function openPicker(side,opts,cur,onPick,ret){
+  closePicker();
+  const title=side==="d"?"借方の勘定科目":"貸方の勘定科目";
+  const ov=document.createElement("div");ov.className="sheet-ov";
+  ov.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${title}"><div class="sheet-h"><b class="${side}">${title}</b><button class="x" aria-label="閉じる">×</button></div><div class="picks">${opts.map((o,i)=>`<button class="pick${o===cur?" on":""}" data-i="${i}">${esc(o)}</button>`).join("")}</div></div>`;
+  document.body.append(ov);sheetEl=ov;
+  ov.addEventListener("click",e=>{if(e.target===ov)closePicker(ret)});
+  ov.querySelector(".x").onclick=()=>closePicker(ret);
+  ov.querySelectorAll(".pick").forEach(b=>b.onclick=()=>{onPick(opts[+b.dataset.i]);closePicker(ret)});
+  ov.addEventListener("keydown",e=>{if(e.key==="Escape")closePicker(ret)});
+  requestAnimationFrame(()=>ov.classList.add("open"));
+  (ov.querySelector(".pick.on")||ov.querySelector(".pick")).focus({preventScroll:true});
+}
+function renderQuestion(host,q,rnd,onDone){
+  closePicker();
+  const opts=optionsFor(q,rnd);
+  const rows=Math.max(q.dr.length,q.cr.length);
+  const cell=(side,on)=>on?`<div class="cell ${side}" data-side="${side}"><button type="button" class="acct" aria-label="${side==="d"?"借方":"貸方"}の勘定科目を選ぶ">科目を選ぶ</button><label class="amt"><span>¥</span><input inputmode="numeric" autocomplete="off" placeholder="0" aria-label="${side==="d"?"借方":"貸方"}の金額"></label></div>`:`<div class="cell ${side} blank" aria-hidden="true"></div>`;
+  let grid="";for(let i=0;i<rows;i++)grid+=cell("d",i<q.dr.length)+cell("c",i<q.cr.length);
+  host.innerHTML=`<article class="slip" aria-label="仕訳問題">
+    <header class="slip-h"><span>${esc(CATS[q.cat])}</span><span class="lv"><span class="st" aria-hidden="true">${STARS(q.lv)}</span> ${LVNAME[q.lv]}</span></header>
+    <p class="qtext">${esc(q.text)}</p>
+    <div class="jt"><div class="jh d">借方</div><div class="jh c">貸方</div>${grid}
+      <div class="jf d"><span>合計</span><b data-sum="d">0</b></div><div class="jf c"><span>合計</span><b data-sum="c">0</b></div></div>
+    <p class="bal" data-bal aria-live="polite">科目を選んで金額を入れよう</p>
+    <div class="slip-a"><button class="btn wide" data-submit>この仕訳で確定する</button></div>
+    <div data-res></div></article>`;
+  const cells=[...host.querySelectorAll(".cell:not(.blank)")];
+  const val=c=>({a:c.dataset.a||"",n:+(c.querySelector("input").value.replace(/[^\d]/g,"")||0)});
+  function sums(){
+    const t={d:0,c:0};cells.forEach(c=>t[c.dataset.side]+=val(c).n);
+    host.querySelector('[data-sum="d"]').textContent=yen(t.d);host.querySelector('[data-sum="c"]').textContent=yen(t.c);
+    const b=host.querySelector("[data-bal]");
+    if(!t.d&&!t.c){b.className="bal";b.textContent="科目を選んで金額を入れよう"}
+    else if(t.d===t.c){b.className="bal ok";b.textContent="貸借が一致しています"}
+    else{b.className="bal";b.textContent=`借方と貸方の差額 ${yen(Math.abs(t.d-t.c))}円`}
+  }
+  cells.forEach(c=>{
+    const a=c.querySelector(".acct"),inp=c.querySelector("input");
+    a.onclick=()=>openPicker(c.dataset.side,opts,c.dataset.a,v=>{c.dataset.a=v;a.textContent=v;a.classList.add("set");inp.focus({preventScroll:true})},a);
+    inp.addEventListener("input",sums);
+    inp.addEventListener("blur",()=>{const v=inp.value.replace(/[^\d]/g,"");inp.value=v?yen(+v):""});
+  });
+  let done=false;
+  const key=arr=>{const m={};arr.forEach(x=>{if(x.a)m[x.a]=(m[x.a]||0)+x.n});return Object.keys(m).sort().map(k=>k+"="+m[k]).join("|")};
+  function finish(forced){
+    if(done)return; done=true; closePicker();
+    const ud=cells.filter(c=>c.dataset.side==="d").map(val), uc=cells.filter(c=>c.dataset.side==="c").map(val);
+    const ok=!forced&&key(ud)===key(q.dr)&&key(uc)===key(q.cr);
+    ["d","c"].forEach(sd=>{const left=(sd==="d"?q.dr:q.cr).slice();cells.filter(c=>c.dataset.side===sd).forEach(c=>{const v=val(c);const i=left.findIndex(x=>x.a===v.a&&x.n===v.n);if(i>=0){left.splice(i,1);c.classList.add("good")}else c.classList.add("bad")})});
+    host.querySelectorAll(".acct,input,[data-submit]").forEach(e=>e.disabled=true);
+    host.querySelector(".slip-a").remove();
+    const st=document.createElement("div");st.className="stamp"+(ok?"":" ng");st.setAttribute("role","img");
+    st.innerHTML=ok?"正解":forced?"時間<br>切れ":"要<br>復習";st.setAttribute("aria-label",ok?"正解":forced?"時間切れ":"不正解");
+    host.querySelector(".jt").append(st);
+    let t="";for(let i=0;i<rows;i++){const d=q.dr[i],c=q.cr[i];t+=`<tr><td>${d?esc(d.a):""}</td><td class="n">${d?yen(d.n):""}</td><td class="c1">${c?esc(c.a):""}</td><td class="n">${c?yen(c.n):""}</td></tr>`}
+    const res=host.querySelector("[data-res]");
+    res.innerHTML=`<div class="res">${ok?"":`<h3>正しい仕訳</h3><table class="ans"><thead><tr><th class="d" colspan="2">借方</th><th class="c" colspan="2">貸方</th></tr></thead><tbody>${t}</tbody></table>`}
+      <h3>ポイント</h3><p class="exp">${esc(q.exp)}</p></div><div class="next" data-next></div>`;
+    onDone(ok,res.querySelector("[data-next]"));
+    const hd=document.querySelector(".bhead"),jt=host.querySelector(".jt");
+    const y=jt.getBoundingClientRect().top+scrollY-(hd?hd.offsetHeight:0)-12;
+    if(y>scrollY||y<scrollY-40)scrollTo({top:Math.max(0,y),behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+  }
+  host.querySelector("[data-submit]").addEventListener("click",()=>finish(false));
+  return {timeout:()=>finish(true),isDone:()=>done};
+}
+function btn(label,fn,cls="btn"){const b=document.createElement("button");b.className=cls;b.textContent=label;b.onclick=fn;return b}
+function setHp(el,ratio){el.style.width=Math.max(0,ratio*100)+"%";el.dataset.l=ratio>.5?"hi":ratio>.25?"mid":"lo"}
+function pop(text,cls=""){const fx=$("#fx");if(!fx)return;const s=document.createElement("span");s.className="pop "+cls;s.textContent=text;fx.append(s);setTimeout(()=>s.remove(),1000)}
+function banner(text){const fx=$("#fx");if(!fx)return;const s=document.createElement("div");s.className="banner";s.textContent=text;fx.append(s)}
+function replay(el,cls){if(!el)return;el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls)}
+
+/* ---------- options ---------- */
+const TIME_OPTS=[
+ {k:"none",label:"時間制限なし",desc:"じっくり考えたいときに。早解きボーナスは一律になる",mul:0},
+ {k:"slow",label:"ゆっくり",desc:"標準の1.5倍の時間",mul:1.5},
+ {k:"std",label:"標準",desc:"後半のステージほど短くなる",mul:1},
+ {k:"hard",label:"きびしい",desc:"標準の0.7倍。本番の時間感覚に慣れたい人向け",mul:.7}
+];
+const getOpt=()=>Object.assign({time:"std"},store.get("opt",{}));
+const timeOpt=()=>TIME_OPTS.find(o=>o.k===getOpt().time)||TIME_OPTS[2];
+const timeFor=e=>{const m=timeOpt().mul;return m?Math.max(10,Math.round(e.time*m)):0};
+function options(){
+  stopTimer();
+  const cur=getOpt().time;
+  app.innerHTML=`<nav class="topnav"><button class="back" id="bk">ホームへ戻る</button></nav>
+  <header class="pagehead"><h1>オプション</h1><p>設定はこの端末に保存されます。</p></header>
+  <section class="panel"><h2 id="tlh">ひとりでモードの制限時間</h2>
+    <div class="opts" role="radiogroup" aria-labelledby="tlh">${TIME_OPTS.map(o=>`<button class="opt" role="radio" aria-checked="${o.k===cur}" data-k="${o.k}"><span class="dotr" aria-hidden="true"></span><span><b>${o.label}</b><small>${o.desc}</small></span></button>`).join("")}</div>
+    <div class="tprev" id="tprev" aria-live="polite"></div>
+  </section>`;
+  $("#bk").onclick=home;
+  const prev=()=>{const m=timeOpt().mul;$("#tprev").innerHTML=ENEMIES.map((e,i)=>`<div><small>ステージ${i+1}</small><b>${m?timeFor(e)+"秒":"なし"}</b></div>`).join("")};
+  prev();
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    store.set("opt",Object.assign(getOpt(),{time:b.dataset.k}));
+    app.querySelectorAll(".opt").forEach(x=>x.setAttribute("aria-checked",String(x===b)));prev();
+  });
+}
+
+/* ---------- home ---------- */
+function home(){
+  stopTimer(); leaveVersus(); closePicker();
+  const best=store.get("bestStage",0), s=store.get("stats",{n:0});
+  app.innerHTML=`<section class="stage">
+    <div class="sky title-sky">
+      <h1 class="logo">仕訳<br>クエスト</h1>
+      <p class="tagline">簿記3級の仕訳で戦うトレーニングゲーム</p>
+      <div class="lineup" aria-hidden="true">${ENEMIES.map(e=>`<div class="bob">${monster(e)}</div>`).join("")}</div>
+    </div>
+    <div class="ground"></div>
+    <nav class="win cmd" aria-label="モードを選ぶ">
+      <button class="cmd-i" data-m="solo"><span><b>ひとりで</b><span>5体のモンスターに仕訳で挑む</span></span><em>${best?`最高 ステージ${best}`:""}</em></button>
+      <button class="cmd-i" data-m="versus"><span><b>ふたりで</b><span>部屋番号でネット対戦</span></span><em></em></button>
+      <button class="cmd-i" data-m="endless"><span><b>とことん</b><span>分野と難易度を選んで練習</span></span><em>${s.n?`${s.n}問 解答`:""}</em></button>
+      <button class="cmd-i" data-m="options"><span><b>オプション</b><span>制限時間などの設定</span></span><em>${timeOpt().label}</em></button>
+    </nav>
+  </section>
+  <p class="homefoot">全${Q.length}問　商品売買から決算整理まで</p>`;
+  app.querySelectorAll(".cmd-i").forEach(b=>b.onclick=()=>({solo:soloStart,versus:versusHome,endless:endless,options:options})[b.dataset.m]());
+}
+
+/* ---------- solo ---------- */
+let S=null;
+function soloStart(){S={stage:0,php:100,used:new Set()};stageStart()}
+function pickLevel(w){const ks=Object.keys(w);let t=ks.reduce((x,k)=>x+w[k],0)*Math.random();for(const k of ks){t-=w[k];if(t<0)return +k}return +ks[0]}
+function nextFor(e){
+  const lv=pickLevel(e.w);
+  const inCat=Q.filter(q=>q.cat===e.cat);
+  let pool=inCat.filter(q=>q.lv===lv&&!S.used.has(q.id));
+  if(!pool.length)pool=inCat.filter(q=>e.w[q.lv]&&!S.used.has(q.id));
+  if(!pool.length){inCat.forEach(q=>S.used.delete(q.id));pool=inCat.filter(q=>e.w[q.lv])}
+  const q=pool[Math.floor(Math.random()*pool.length)];S.used.add(q.id);return q;
+}
+function stageStart(){const e=ENEMIES[S.stage];S.enemy=e;S.ehp=e.hp;drawSolo(S.stage>=3&&timeFor(e)?`強敵 ${e.name}があらわれた！ 制限時間は${timeFor(e)}秒だ。`:`${e.name}があらわれた！`);soloQ()}
+function drawSolo(msg){
+  const e=S.enemy;
+  app.innerHTML=`<section class="bhead sky" id="arena">
+    <div class="bh-top"><button class="back" id="bk">ホーム</button><span class="grow px">ステージ ${S.stage+1}/5　${esc(CATS[e.cat])}</span><span class="power" aria-label="強さ ${S.stage+1}/5">${"★".repeat(S.stage+1)}${"☆".repeat(4-S.stage)}</span></div>
+    <div class="bh-main">
+      <div class="bh-foe"><div class="bob" id="foe">${monster(e)}</div></div>
+      <div class="bh-stats">
+        <div class="who"><span>${esc(e.name)}</span><span id="ehpT"></span></div><div class="hp foe-hp"><i id="ehp"></i></div>
+        <div class="who"><span>あなた</span><span id="phpT"></span></div><div class="hp"><i id="php"></i></div>
+        <div class="clock" id="clk"><span>のこり</span><div class="tbar"><i id="tm"></i></div><span id="tmT"></span></div>
+      </div>
+    </div>
+    <div class="msg" id="msg" aria-live="polite">${esc(msg)}</div>
+    <div class="fx" id="fx"></div>
+  </section><div id="q"></div>`;
+  $("#bk").onclick=home;
+  drawHp();
+}
+function drawHp(){const e=S.enemy;setHp($("#ehp"),S.ehp/e.hp);$("#ehpT").textContent=`${S.ehp}/${e.hp}`;setHp($("#php"),S.php/100);$("#phpT").textContent=`HP ${S.php}`}
+function setMsg(t){const m=$("#msg");if(m)m.textContent=t}
+function soloQ(){
+  const q=nextFor(S.enemy); const TL=timeFor(S.enemy); let left=TL;
+  const ctl=renderQuestion($("#q"),q,Math.random,(ok,next)=>{
+    stopTimer();
+    const e=S.enemy;
+    if(ok){
+      const dmg=10+q.lv*10+(TL?Math.round(20*left/TL):10);
+      S.ehp=Math.max(0,S.ehp-dmg);
+      replay($("#foe"),"hit");pop(String(dmg),q.lv===3?"crit":"");
+      setMsg(`${q.lv===3?"会心の仕訳！ ":"正しい仕訳！ "}${e.name}に${dmg}のダメージ！`);
+    }else{
+      S.php=Math.max(0,S.php-e.atk);
+      replay($("#arena"),"hurt");replay($("#arena"),"flash");pop("-"+e.atk,"me");
+      setMsg(`${e.name}のこうげき！ あなたは${e.atk}のダメージをうけた。`);
+    }
+    drawHp();
+    if(S.ehp<=0){
+      store.set("bestStage",Math.max(store.get("bestStage",0),S.stage+1));
+      $("#foe").classList.add("down");
+      if(S.stage===4){banner("全ステージクリア");setMsg(`${e.name}をたおした！ 帳簿はきれいに締まった。`);next.append(btn("ホームへ",home,"btn ghost"),btn("もう一度挑戦する",soloStart))}
+      else{banner("ステージクリア");setMsg(`${e.name}をたおした！ HPが20回復する。`);next.append(btn("次のステージへ進む",()=>{S.stage++;S.php=Math.min(100,S.php+20);stageStart();scrollTo({top:0})}))}
+    }else if(S.php<=0){
+      banner("ゲームオーバー");setMsg("あなたはたおれてしまった……");next.append(btn("ホームへ",home,"btn ghost"),btn("ステージ1から挑戦する",soloStart));
+    }else next.append(btn("次の問題へ",()=>{soloQ();scrollTo({top:0})}));
+    next.lastChild.focus({preventScroll:true});
+  });
+  if(!TL){$("#clk").innerHTML='<span>のこり</span><span class="nolimit">制限なし</span>';return}
+  const tm=$("#tm"),tt=$("#tmT");tm.style.width="100%";tm.classList.remove("low");tt.textContent=TL;
+  timerId=setInterval(()=>{left-=.25;tm.style.width=Math.max(0,left/TL*100)+"%";tm.classList.toggle("low",left/TL<.25);tt.textContent=Math.max(0,Math.ceil(left));if(left<=0){stopTimer();ctl.timeout()}},250);
+}
+
+/* ---------- endless ---------- */
+function endless(){
+  stopTimer();
+  let cat=store.get("endCat","all");
+  let lvSel=store.get("endLv","all");
+  const st=()=>store.get("stats",{n:0,ok:0,streak:0,best:0,miss:[]});
+  function pick(){
+    const s=st();let pool=Q;
+    if(cat==="miss")pool=Q.filter(q=>s.miss.includes(q.id));
+    else if(cat!=="all")pool=Q.filter(q=>q.cat===cat);
+    if(lvSel!=="all")pool=pool.filter(q=>q.lv===+lvSel);
+    return pool.length?pool[Math.floor(Math.random()*pool.length)]:null;
+  }
+  function draw(){
+    const s=st();
+    const chips=[["all","すべて"],...Object.entries(CATS),["miss",`苦手 ${s.miss.length}問`]];
+    app.innerHTML=`<nav class="topnav"><button class="back" id="bk">ホームへ戻る</button></nav>
+    <header class="pagehead"><h1>とことんモード</h1><p>分野と難易度をしぼって、何問でも解ける。間違えた問題は「苦手」に集まる。</p></header>
+    <section class="report" aria-label="成績"><div><b>${s.n?Math.round(s.ok/s.n*100):0}%</b><span>正答率</span></div><div><b>${s.n}</b><span>解いた数</span></div><div><b>${s.streak}</b><span>連続正解</span></div><div><b>${s.best}</b><span>最高連続</span></div></section>
+    <div class="filters">
+      <div class="fl"><span>出題範囲</span><div class="tabs" role="group" aria-label="出題範囲">${chips.map(([k,l])=>`<button class="tab" data-c="${k}" aria-pressed="${k===cat}">${esc(l)}</button>`).join("")}</div></div>
+      <div class="fl"><span>難易度</span><div class="tabs" role="group" aria-label="難易度">${[["all","すべて"],["1","★ 基本"],["2","★★ 標準"],["3","★★★ 応用"]].map(([k,l])=>`<button class="tab" data-l="${k}" aria-pressed="${k===String(lvSel)}">${l}</button>`).join("")}</div></div>
+    </div><div id="q"></div>`;
+    $("#bk").onclick=home;
+    app.querySelectorAll(".tab[data-c]").forEach(c=>c.onclick=()=>{cat=c.dataset.c;store.set("endCat",cat);draw()});
+    app.querySelectorAll(".tab[data-l]").forEach(c=>c.onclick=()=>{lvSel=c.dataset.l;store.set("endLv",lvSel);draw()});
+    const on=app.querySelector('.tab[aria-pressed="true"]');if(on)on.scrollIntoView({inline:"nearest",block:"nearest"});
+    const q=pick();
+    if(!q){$("#q").innerHTML=`<div class="empty">${cat==="miss"&&!s.miss.length?"苦手な問題はまだありません。間違えた問題がここに集まります。":"この組み合わせの問題はありません。出題範囲か難易度を変えてください。"}</div>`;return}
+    renderQuestion($("#q"),q,Math.random,(ok,next)=>{
+      const s=st();s.n++;
+      if(ok){s.ok++;s.streak++;s.best=Math.max(s.best,s.streak);s.miss=s.miss.filter(i=>i!==q.id)}
+      else{s.streak=0;if(!s.miss.includes(q.id))s.miss.push(q.id)}
+      store.set("stats",s);
+      const r=app.querySelectorAll(".report b");r[0].textContent=Math.round(s.ok/s.n*100)+"%";r[1].textContent=s.n;r[2].textContent=s.streak;r[3].textContent=s.best;
+      next.append(btn("次の問題へ",()=>{draw();scrollTo({top:0})}));next.lastChild.focus({preventScroll:true});
+    });
+  }
+  draw();
+}
+
+/* ---------- versus (PeerJS / WebRTC) ---------- */
+const VQ=10, VHP=100, HIT=20, MISS=10;
+let V=null;
+const rand4=()=>String(Math.floor(1000+Math.random()*9000));
+function leaveVersus(){if(V){try{V.conn&&V.conn.close()}catch(e){}try{V.peer&&V.peer.destroy()}catch(e){}}V=null}
+function versusHome(){
+  stopTimer();leaveVersus();
+  const nick=store.get("nick","");
+  app.innerHTML=`<nav class="topnav"><button class="back" id="bk">ホームへ戻る</button></nav>
+  <header class="pagehead"><h1>ふたりでモード</h1><p>同じ${VQ}問を同時に解いて、先に相手のHPを0にしたほうの勝ち。</p></header>
+  <div class="rules"><div><b>${VQ}</b>問で勝負</div><div class="g"><b>−${HIT}</b>正解で相手のHP</div><div class="r"><b>−${MISS}</b>ミスで自分のHP</div></div>
+  <section class="panel">
+    <div class="field"><label for="nk">ニックネーム</label><input id="nk" maxlength="12" value="${esc(nick)}" placeholder="例：しわけ太郎"></div>
+    <div style="margin-top:14px"><button class="btn wide" id="mk">部屋をつくる</button></div>
+    <div class="or">部屋番号をもらったら</div>
+    <div class="field"><label for="cd">部屋番号（4桁）</label><input id="cd" class="codein" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000"></div>
+    <div style="margin-top:12px"><button class="btn ghost wide" id="jn">部屋に入る</button></div>
+    <p class="note" id="vs" aria-live="polite"></p>
+  </section>`;
+  $("#bk").onclick=home;
+  const status=t=>{const el=$("#vs");if(el)el.textContent=t};
+  if(typeof Peer==="undefined"){status("対戦用の通信ライブラリを読み込めませんでした。ネット接続を確認して再読み込みしてください。");$("#mk").disabled=$("#jn").disabled=true;return}
+  status("相手にこのページのURLと部屋番号を伝えると、一緒に遊べます。");
+  const nk=()=>{const v=$("#nk").value.trim().slice(0,12)||"ななしの簿記家";store.set("nick",v);return v};
+  $("#mk").onclick=()=>enterRoom(rand4(),"host",nk());
+  $("#jn").onclick=()=>{const c=$("#cd").value.replace(/\D/g,"");if(c.length!==4){status("部屋番号は4桁の数字で入力してください。");return}enterRoom(c,"guest",nk())};
+}
+function enterRoom(code,role,nick){
+  leaveVersus();
+  V={code,role,nick,round:0,seed:0,phase:"lobby",correct:0,wrong:0,idx:0,done:false,opp:null,ended:false,conn:null};
+  const me=V;
+  const peer=role==="host"?new Peer("boki3-"+code):new Peer();
+  V.peer=peer;
+  drawLobby();
+  peer.on("open",()=>{if(V!==me)return;if(role==="guest")attach(peer.connect("boki3-"+code,{reliable:true}))});
+  peer.on("connection",c=>{
+    if(V!==me)return;
+    if(V.conn&&V.conn.open){c.on("open",()=>{c.send({t:"full"});setTimeout(()=>c.close(),300)});return}
+    attach(c);
+  });
+  peer.on("error",err=>{
+    if(V!==me)return;
+    if(err.type==="unavailable-id"){enterRoom(rand4(),"host",nick);return}
+    if(err.type==="peer-unavailable"){alert("部屋が見つかりません。番号が正しいか、ホストが部屋をつくっているか確認してください。");versusHome();return}
+    if(err.type==="network"||err.type==="server-error"||err.type==="socket-error"){alert("通信サーバーにつながりません。時間をおいてもう一度試してください。");versusHome()}
+  });
+}
+function attach(c){
+  const me=V;V.conn=c;
+  c.on("open",()=>{if(V===me){pushP();onState()}});
+  c.on("data",d=>{
+    if(V!==me||!d||typeof d!=="object")return;
+    if(d.t==="full"){alert("この部屋はすでに2人そろっています。");versusHome();return}
+    if(d.t==="p"){V.opp={presence:{nick:String(d.nick||"相手").slice(0,12),role:d.role,round:+d.round||0,seed:+d.seed||0,phase:String(d.phase),correct:+d.correct||0,wrong:+d.wrong||0,idx:+d.idx||0,done:!!d.done}};onState()}
+  });
+  c.on("close",()=>{if(V!==me)return;V.opp=null;V.conn=null;onState()});
+}
+function pushP(){if(!V||!V.conn||!V.conn.open)return;try{V.conn.send({t:"p",nick:V.nick,role:V.role,round:V.round,seed:V.seed,phase:V.phase,correct:V.correct,wrong:V.wrong,idx:V.idx,done:V.done})}catch(e){}}
+function oppStats(){const o=V.opp&&V.opp.presence;if(!o||o.round!==V.round)return{correct:0,wrong:0,idx:0,done:false};return{correct:o.correct,wrong:o.wrong,idx:o.idx,done:o.done}}
+function onState(){
+  if(!V)return;
+  const o=V.opp&&V.opp.presence;
+  if(V.role==="guest"&&o&&o.role==="host"&&o.phase==="play"&&o.round>V.round){V.round=o.round;V.seed=o.seed;beginMatch();return}
+  if(V.phase==="lobby"||V.phase==="over")drawLobby();
+  else updateDuel();
+}
+function drawLobby(){
+  if(!V)return;
+  const opp=V.opp?V.opp.presence.nick:null;
+  if(V.phase==="over"&&$("#duel"))return;
+  app.innerHTML=`<nav class="topnav"><button class="back" id="bk">部屋から出る</button></nav>
+  <section class="stage">
+    <div class="sky lobby"><p>部屋番号</p><div class="codebox" aria-label="部屋番号 ${esc(V.code)}">${[...V.code].map(d=>`<span>${d}</span>`).join("")}</div>
+      <p>${V.role==="host"?"この番号を相手に伝えよう":"ホストの部屋に入りました"}</p><div style="height:18px"></div></div>
+    <div class="ground"></div>
+    <div class="win"><div class="plates"><div class="plate"><small>あなた</small><span id="mynm"></span></div><div class="vs">VS</div><div class="plate${opp?"":" wait"}"><small>相手</small><span id="on"></span></div></div></div>
+    <div class="win msg" id="la" aria-live="polite"></div>
+  </section><div id="lact"></div>`;
+  $("#mynm").textContent=V.nick;
+  $("#on").textContent=opp||"待っています…";
+  $("#bk").onclick=versusHome;
+  if(V.role==="host"){
+    $("#la").textContent=opp?`${opp}が来た！ 準備ができたら始めよう。`:"相手が部屋に入るのを待っています…";
+    const b=btn("対戦をはじめる",startMatch,"btn wide");b.disabled=!opp;$("#lact").append(b);
+  }else $("#la").textContent=opp?"ホストが対戦を始めるのを待っています…":"部屋に接続しています…";
+}
+function startMatch(){V.round++;V.seed=Math.floor(Math.random()*1e9);beginMatch()}
+function beginMatch(){
+  V.phase="play";V.correct=V.wrong=V.idx=0;V.done=false;V.ended=false;
+  V.qs=shuffle(Q,rngOf(V.seed)).slice(0,VQ);
+  pushP();
+  let n=3;
+  app.innerHTML=`<section class="stage"><div class="sky"><div class="count" id="cd" aria-live="assertive">3</div><p class="px" style="text-align:center;margin:0;padding-bottom:22px;color:#C3CAE6">同じ問題で勝負！</p></div><div class="ground"></div></section>`;
+  const t=setInterval(()=>{n--;const el=$("#cd");if(!el){clearInterval(t);return}if(n>0)el.textContent=n;else{clearInterval(t);drawDuel();vsQ()}},800);
+}
+const hpOf=(myWrong,oppCorrect)=>Math.max(0,VHP-oppCorrect*HIT-myWrong*MISS);
+function drawDuel(){
+  app.innerHTML=`<section class="bhead sky" id="duel">
+    <div class="bh-top"><button class="back" id="bk">退出</button><span class="grow px" id="qc"></span><span class="px">部屋 ${esc(V.code)}</span></div>
+    <div class="duel">
+      <div><div class="who"><span id="mn"></span></div><div class="hp"><i id="mh"></i></div><div class="meta" id="mt"></div></div>
+      <div class="vs">VS</div>
+      <div><div class="who"><span id="onm"></span></div><div class="hp"><i id="oh"></i></div><div class="meta" id="ot"></div></div>
+    </div>
+    <div class="msg" id="msg" aria-live="polite">勝負開始！</div>
+    <div class="fx" id="fx"></div>
+  </section><div id="q"></div>`;
+  $("#bk").onclick=versusHome;
+  $("#mn").textContent=V.nick;
+  updateDuel();
+}
+function updateDuel(){
+  if(!V||!$("#duel"))return;
+  const o=oppStats();
+  const mh=hpOf(V.wrong,o.correct), oh=hpOf(o.wrong,V.correct);
+  const prev=V.lastHp||{mh:VHP,oh:VHP};
+  if(mh<prev.mh&&o.correct>(V.lastOppC||0)){replay($("#duel"),"flash");pop("-"+(prev.mh-mh),"me")}
+  V.lastHp={mh,oh};V.lastOppC=o.correct;
+  $("#onm").textContent=V.opp?String(V.opp.presence.nick).slice(0,12):"相手が退出しました";
+  setHp($("#mh"),mh/VHP);setHp($("#oh"),oh/VHP);
+  $("#mt").textContent=`HP ${mh}　${V.idx}/${VQ}問`;$("#ot").textContent=`HP ${oh}　${o.idx}/${VQ}問`;
+  $("#qc").textContent=`第${Math.min(V.idx+1,VQ)}問 / ${VQ}`;
+  if(V.ended)return;
+  const finished=mh<=0||oh<=0||(V.done&&o.done)||(!V.opp&&V.idx>0);
+  if(finished)endMatch(mh,oh);
+  else if(V.done)$("#msg").textContent="全問解き終わった。相手を待っています…";
+}
+function vsQ(){
+  if(!V||V.ended)return;
+  if(V.idx>=VQ){V.done=true;pushP();$("#q").innerHTML="";updateDuel();return}
+  const q=V.qs[V.idx];
+  renderQuestion($("#q"),q,rngOf(V.seed+V.idx*7919),(ok,next)=>{
+    if(ok){V.correct++;$("#msg").textContent=`正解！ 相手に${HIT}のダメージ！`;pop(String(HIT),"opp")}
+    else{V.wrong++;$("#msg").textContent=`不正解… 自分に${MISS}のダメージ。`;replay($("#duel"),"hurt");pop("-"+MISS,"me")}
+    V.idx++;if(V.idx>=VQ)V.done=true;pushP();updateDuel();
+    if(!V.ended){next.append(btn(V.idx>=VQ?"結果を待つ":"次の問題へ",()=>{vsQ();scrollTo({top:0})}));next.lastChild.focus({preventScroll:true})}
+  });
+}
+function endMatch(mh,oh){
+  V.ended=true;V.phase="over";V.done=true;pushP();closePicker();
+  const res=mh===oh?"ひきわけ":mh>oh?"あなたの勝ち！":"あなたの負け…";
+  banner(mh===oh?"ひきわけ":mh>oh?"勝利":"敗北");
+  $("#msg").textContent=`${res}　あなた HP ${mh}　相手 HP ${oh}`;
+  const q=$("#q");q.innerHTML=`<section class="panel vend"><div class="big">${esc(res)}</div><div class="next" id="ea"></div></section>`;
+  const ea=$("#ea");
+  ea.append(btn("部屋から出る",versusHome,"btn ghost"));
+  if(V.role==="host")ea.append(btn("もう一度対戦する",()=>{V.lastHp=null;V.lastOppC=0;startMatch()}));
+  else{const p=document.createElement("p");p.className="note";p.style.width="100%";p.textContent="ホストが「もう一度対戦する」を押すと次の対戦が始まります。";ea.append(p);V.lastHp=null;V.lastOppC=0}
+}
+
+new MutationObserver(()=>document.body.classList.toggle("battle",!!document.querySelector(".bhead"))).observe(app,{childList:true});
+home();
+
+</script>
+</body>
+</html>
