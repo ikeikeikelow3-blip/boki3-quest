@@ -175,6 +175,9 @@ body.battle::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-are
 .bh-top .back{color:#C3CAE6;font-size:13px;padding:4px 6px 4px 0}
 .bh-top .grow{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bh-top .power{color:#F3CF63;letter-spacing:1px}
+.skip{flex:none;font-size:12px;color:var(--wink);padding:4px 10px;border-radius:999px;box-shadow:inset 0 0 0 1.5px #C3CAE6;min-height:28px}
+.skip:active{background:#ffffff22}
+.skip:disabled{opacity:.4}
 .bh-main{display:grid;grid-template-columns:84px 1fr;gap:10px;align-items:center;margin-top:2px}
 .bh-foe{height:84px;display:grid;place-items:end center;border-bottom:3px solid #68A05A;background:linear-gradient(transparent calc(100% - 8px),#3E6440 0)}
 .bh-foe .bob{width:70px;height:70px;margin-bottom:2px}
@@ -424,14 +427,15 @@ function renderQuestion(host,q,rnd,onDone){
   closePicker();
   const opts=optionsFor(q,rnd);
   const rows=Math.max(q.dr.length,q.cr.length);
+  const inRows=Math.max(2,rows);
   const cell=(side,on)=>on?`<div class="cell ${side}" data-side="${side}"><button type="button" class="acct" aria-label="${side==="d"?"借方":"貸方"}の勘定科目を選ぶ">科目を選ぶ</button><label class="amt"><span>¥</span><input inputmode="numeric" autocomplete="off" placeholder="0" aria-label="${side==="d"?"借方":"貸方"}の金額"></label></div>`:`<div class="cell ${side} blank" aria-hidden="true"></div>`;
-  let grid="";for(let i=0;i<rows;i++)grid+=cell("d",i<q.dr.length)+cell("c",i<q.cr.length);
+  let grid="";for(let i=0;i<inRows;i++)grid+=cell("d",true)+cell("c",true);
   host.innerHTML=`<article class="slip" aria-label="仕訳問題">
     <header class="slip-h"><span>${esc(CATS[q.cat])}</span><span class="lv"><span class="st" aria-hidden="true">${STARS(q.lv)}</span> ${LVNAME[q.lv]}</span></header>
     <p class="qtext">${esc(q.text)}</p>
     <div class="jt"><div class="jh d">借方</div><div class="jh c">貸方</div>${grid}
       <div class="jf d"><span>合計</span><b data-sum="d">0</b></div><div class="jf c"><span>合計</span><b data-sum="c">0</b></div></div>
-    <p class="bal" data-bal aria-live="polite">科目を選んで金額を入れよう</p>
+    <p class="bal" data-bal aria-live="polite">科目と金額を入れよう（使わない行は空欄でOK）</p>
     <div class="slip-a"><button class="btn wide" data-submit>この仕訳で確定する</button></div>
     <div data-res></div></article>`;
   const cells=[...host.querySelectorAll(".cell:not(.blank)")];
@@ -440,7 +444,7 @@ function renderQuestion(host,q,rnd,onDone){
     const t={d:0,c:0};cells.forEach(c=>t[c.dataset.side]+=val(c).n);
     host.querySelector('[data-sum="d"]').textContent=yen(t.d);host.querySelector('[data-sum="c"]').textContent=yen(t.c);
     const b=host.querySelector("[data-bal]");
-    if(!t.d&&!t.c){b.className="bal";b.textContent="科目を選んで金額を入れよう"}
+    if(!t.d&&!t.c){b.className="bal";b.textContent="科目と金額を入れよう（使わない行は空欄でOK）"}
     else if(t.d===t.c){b.className="bal ok";b.textContent="貸借が一致しています"}
     else{b.className="bal";b.textContent=`借方と貸方の差額 ${yen(Math.abs(t.d-t.c))}円`}
   }
@@ -456,7 +460,7 @@ function renderQuestion(host,q,rnd,onDone){
     if(done)return; done=true; closePicker();
     const ud=cells.filter(c=>c.dataset.side==="d").map(val), uc=cells.filter(c=>c.dataset.side==="c").map(val);
     const ok=!forced&&key(ud)===key(q.dr)&&key(uc)===key(q.cr);
-    ["d","c"].forEach(sd=>{const left=(sd==="d"?q.dr:q.cr).slice();cells.filter(c=>c.dataset.side===sd).forEach(c=>{const v=val(c);const i=left.findIndex(x=>x.a===v.a&&x.n===v.n);if(i>=0){left.splice(i,1);c.classList.add("good")}else c.classList.add("bad")})});
+    ["d","c"].forEach(sd=>{const left=(sd==="d"?q.dr:q.cr).slice();cells.filter(c=>c.dataset.side===sd).forEach(c=>{const v=val(c);const i=left.findIndex(x=>x.a===v.a&&x.n===v.n);if(!v.a&&!v.n)return;if(i>=0){left.splice(i,1);c.classList.add("good")}else c.classList.add("bad")})});
     host.querySelectorAll(".acct,input,[data-submit]").forEach(e=>e.disabled=true);
     host.querySelector(".slip-a").remove();
     const st=document.createElement("div");st.className="stamp"+(ok?"":" ng");st.setAttribute("role","img");
@@ -546,7 +550,7 @@ function stageStart(){const e=ENEMIES[S.stage];S.enemy=e;S.ehp=e.hp;drawSolo(S.s
 function drawSolo(msg){
   const e=S.enemy;
   app.innerHTML=`<section class="bhead sky" id="arena">
-    <div class="bh-top"><button class="back" id="bk">ホーム</button><span class="grow px">ステージ ${S.stage+1}/5　${esc(CATS[e.cat])}</span><span class="power" aria-label="強さ ${S.stage+1}/5">${"★".repeat(S.stage+1)}${"☆".repeat(4-S.stage)}</span></div>
+    <div class="bh-top"><button class="back" id="bk">ホーム</button><span class="grow px">ステージ ${S.stage+1}/5　${esc(CATS[e.cat])}</span><span class="power" aria-label="強さ ${S.stage+1}/5">${"★".repeat(S.stage+1)}${"☆".repeat(4-S.stage)}</span><button class="skip" id="skip">${S.stage===4?"終了":"スキップ"}</button></div>
     <div class="bh-main">
       <div class="bh-foe"><div class="bob" id="foe">${monster(e)}</div></div>
       <div class="bh-stats">
@@ -559,7 +563,18 @@ function drawSolo(msg){
     <div class="fx" id="fx"></div>
   </section><div id="q"></div>`;
   $("#bk").onclick=home;
+  $("#skip").onclick=skipStage;
   drawHp();
+}
+function skipStage(){
+  const e=S.enemy, last=S.stage===4;
+  if(!confirm(last?`${e.name}との戦いをやめて、ひとりでモードを終了しますか？`:`${e.name}との戦いを飛ばして、次のステージへ進みますか？`))return;
+  stopTimer();closePicker();
+  if(!last){S.stage++;stageStart();scrollTo({top:0});return}
+  setMsg(`${e.name}との戦いを終了した。`);
+  const q=$("#q");q.innerHTML=`<section class="panel vend"><div class="big">おつかれさま</div><p class="note">最後まで戦うと、全ステージクリアが記録されます。</p><div class="next" id="ea"></div></section>`;
+  $("#ea").append(btn("ホームへ",home,"btn ghost"),btn("もう一度挑戦する",soloStart));
+  $("#skip").disabled=true;
 }
 function drawHp(){const e=S.enemy;setHp($("#ehp"),S.ehp/e.hp);$("#ehpT").textContent=`${S.ehp}/${e.hp}`;setHp($("#php"),S.php/100);$("#phpT").textContent=`HP ${S.php}`}
 function setMsg(t){const m=$("#msg");if(m)m.textContent=t}
